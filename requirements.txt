@@ -1,0 +1,11 @@
+# Python dependencies for Twitter Sentiment Analysis
+
+pyspark==3.5.0
+kafka-python==2.0.2
+tweepy==4.14.0
+textblob==0.17.1
+pandas==2.1.0
+flask==3.0.0
+flask-cors==4.0.0
+pyarrow==14.0.0
+python-dotenv==1.0.0

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Twitter Sentiment Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .row { display:flex; gap:20px; }
+    .card { padding:16px; border:1px solid #ddd; border-radius:8px; background:#fff; }
+  </style>
+</head>
+<body>
+  <h2>Twitter Sentiment Dashboard</h2>
+  <div class="row">
+    <div class="card" style="flex:1">
+      <h3>Metrics</h3>
+      <div id="metrics">
+        Loading...
+      </div>
+    </div>
+    <div class="card" style="flex:2">
+      <h3>Sentiment Distribution</h3>
+      <canvas id="distChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <h3>Recent Tweets</h3>
+  <div id="tweets"></div>
+
+  <script>
+    const metricsEl = document.getElementById('metrics');
+    const tweetsEl = document.getElementById('tweets');
+    const ctx = document.getElementById('distChart').getContext('2d');
+    let distChart = new Chart(ctx, {
+      type: 'pie',
+      data: { labels: ['Positive','Neutral','Negative'], datasets: [{ data: [1,1,1], backgroundColor: ['#2ecc71','#95a5a6','#e74c3c'] }] },
+      options: { responsive: true }
+    });
+
+    async function fetchMetrics(){
+      try{
+        const r = await fetch('/api/metrics');
+        const data = await r.json();
+        metricsEl.innerHTML = `
+          <b>Total tweets:</b> ${data.total_tweets} <br>
+          <b>Avg polarity:</b> ${data.avg_polarity.toFixed(3)} <br>
+          <b>Avg subjectivity:</b> ${data.avg_subjectivity.toFixed(3)} <br>
+          <b>Dominant sentiment:</b> ${data.dominant_sentiment}
+        `;
+
+        const dist = data.sentiment_distribution || {Positive:0,Neutral:0,Negative:0};
+        distChart.data.datasets[0].data = [dist.Positive, dist.Neutral, dist.Negative];
+        distChart.update();
+      }catch(e){
+        metricsEl.textContent = 'Error fetching metrics';
+      }
+    }
+
+    async function fetchTweets(){
+      try{
+        const r = await fetch('/api/tweets');
+        const data = await r.json();
+        tweetsEl.innerHTML = '';
+        data.slice(0,20).forEach(t => {
+          const div = document.createElement('div');
+          div.style.borderBottom = '1px solid #eee';
+          div.style.padding = '8px 0';
+          div.innerHTML = `<div><b>${t.sentiment}</b> (${t.polarity.toFixed(2)})</div><div>${t.text}</div>`;
+          tweetsEl.appendChild(div);
+        });
+      }catch(e){
+        tweetsEl.textContent = 'Error fetching tweets';
+      }
+    }
+
+    async function tick(){
+      await fetchMetrics();
+      await fetchTweets();
+    }
+
+    // Poll every 5 seconds
+    tick();
+    setInterval(tick, 5000);
+  </script>
+</body>
+</html>
