@@ -10,6 +10,7 @@ services:
       - "2181:2181"
     networks:
       - sentiment-network
+    watch: []
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -24,6 +25,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - sentiment-network
+    watch: []
 
   spark:
     image: bitnami/spark:latest
@@ -39,3 +41,4 @@ services:
 networks:
   sentiment-network:
     driver: bridge
+watch: []
