@@ -190,7 +190,7 @@ if __name__ == "__main__":
     # Read runtime mode from environment
     MODE = os.getenv('CONSUMER_MODE', 'kafka')  # 'kafka' or 'socket'
     KAFKA_BOOTSTRAP = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
-    KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'twitter-stream')
+    KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'tweets')
     TCP_HOST = os.getenv('TCP_HOST', 'localhost')
     TCP_PORT = int(os.getenv('TCP_PORT', '9999'))
 
